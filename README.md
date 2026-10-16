@@ -5,3 +5,21 @@ https://colinbm.github.io/terranota-public/.
 
 - `index.html`: the website (a placeholder for now).
 - `privacy/`: the privacy policy.
+- `data/maps-index.json`: a search index of maps georeferenced with
+  [Allmaps](https://allmaps.org), built daily from its open data (CC0).
+
+## Map index
+
+https://colinbm.github.io/terranota-public/data/maps-index.json
+
+`maps` is a list of rows in `columns` order, sorted by ground area (most local
+first):
+
+| Column | |
+|---|---|
+| `id` | Allmaps map ID; the full georeference is at `mapURLPrefix` + `id` |
+| `title` | From the IIIF manifest or canvas label; null when there isn't one |
+| `provider` | Index into `providers`, or null |
+| `service` | IIIF Image API base URL |
+| `minLat`, `minLon`, `maxLat`, `maxLon` | Extent of the map's outline |
+| `area` | Ground area covered, in m² |

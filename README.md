@@ -1,7 +1,7 @@
 # terranota-public
 
 Public files for the Terra Nota iOS app, served by GitHub Pages at
-https://colinbm.github.io/terranota-public/.
+https://terranota.app.
 
 - `index.html` and `assets/`: the website.
 - `privacy/`: the privacy policy.
@@ -10,7 +10,7 @@ https://colinbm.github.io/terranota-public/.
 
 ## Map index
 
-https://colinbm.github.io/terranota-public/data/maps-index.json
+https://terranota.app/data/maps-index.json
 
 `maps` is a list of rows in `columns` order, sorted by ground area (most local
 first):

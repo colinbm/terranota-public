@@ -6,7 +6,8 @@ https://terranota.app.
 - `index.html` and `assets/`: the website.
 - `privacy/`: the privacy policy.
 - `data/maps-index.json`: a search index of maps georeferenced with
-  [Allmaps](https://allmaps.org), built daily from its open data (CC0).
+  [Allmaps](https://allmaps.org), built daily from its open data (CC0). It
+  lists only maps whose library's licence lets Terra Nota use them.
 
 ## Map index
 

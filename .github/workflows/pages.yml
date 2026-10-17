@@ -2,6 +2,8 @@
 #
 # The index is deployed as a Pages artifact, not committed, so the repository
 # doesn't grow by megabytes a day. Allmaps refreshes its dump at about 05:10 UTC.
+# What each map's manifest says about its licence is kept in the Actions cache
+# between runs, so only new manifests (and a few due a recheck) are fetched.
 name: Pages
 
 on:
@@ -23,6 +25,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 150
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -38,8 +41,24 @@ jobs:
           mkdir -p _site/data
           cp -R index.html privacy assets .nojekyll _site/
 
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/licences.json
+          key: map-licences-${{ github.run_id }}
+          restore-keys: map-licences-
+
       - name: Build map index
-        run: python3 scripts/build_map_index.py _site/data/maps-index.json
+        run: |
+          mkdir -p .cache
+          python3 scripts/build_map_index.py _site/data/maps-index.json --licences .cache/licences.json --fetch-minutes 100
+
+      # Saved under a new key each run (cache entries can't be overwritten),
+      # even if the deploy fails, so the manifests fetched aren't lost.
+      - uses: actions/cache/save@v4
+        if: always() && hashFiles('.cache/licences.json') != ''
+        with:
+          path: .cache/licences.json
+          key: map-licences-${{ github.run_id }}
 
       - uses: actions/configure-pages@v5
 

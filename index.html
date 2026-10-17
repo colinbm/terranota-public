@@ -83,6 +83,9 @@
   .badge { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper);
            border-radius: 12px; padding: 12px 18px; font: 600 15px var(--sans); }
   .badge svg { width: 18px; height: 18px; fill: currentColor; }
+  a.badge { text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  a.badge:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(40, 25, 10, 0.25); }
+  nav a.nav-beta { color: var(--red); font-weight: 600; }
   .badge-note { font: 14px var(--sans); color: var(--muted); margin: 12px 0 0; }
 
   .phone { margin: 0 auto; width: min(290px, 100%); border-radius: 46px; padding: 9px;
@@ -119,6 +122,12 @@
   .privacy-note .wrap { max-width: 760px; text-align: center; }
   .privacy-note .intro { margin: 0 auto; }
 
+  .beta { border-top: 1px solid var(--rule); }
+  .beta .wrap { max-width: 760px; text-align: center; }
+  .beta .intro { margin: 0 auto 28px; }
+  .beta-icon { width: 72px; height: 72px; border-radius: 17px; margin: 0 auto 24px;
+               box-shadow: 0 8px 22px rgba(60, 40, 20, 0.22); }
+
   footer { border-top: 1px solid var(--rule); padding: 32px 0 48px; font: 14px var(--sans); color: var(--muted); }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
   footer a { color: var(--muted); }
@@ -147,6 +156,7 @@
       <a class="optional" href="#how">How it works</a>
       <a class="optional" href="#features">Features</a>
       <a href="privacy/">Privacy</a>
+      <a class="nav-beta" href="https://testflight.apple.com/join/ZnjSDkx8">Try the beta</a>
     </nav>
   </div>
 </header>
@@ -158,11 +168,11 @@
       <img class="hero-icon" src="assets/icon.png" alt="Terra Nota app icon">
       <h1>Find yourself on any map.</h1>
       <p class="lede">Terra Nota puts a live “you are here” dot on any map image, old or new. Bring an antique county map, a trail leaflet or a site plan, match a few places on it to the real world, then go and explore it.</p>
-      <div class="badge">
+      <a class="badge" href="https://testflight.apple.com/join/ZnjSDkx8">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.66zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.01.61-2.67 1.37-.58.67-1.09 1.76-.95 2.8 1.01.08 2.05-.52 2.68-1.28z"/></svg>
-        Coming soon to the App Store
-      </div>
-      <p class="badge-note">For iPhone and iPad.</p>
+        Try the beta on TestFlight
+      </a>
+      <p class="badge-note">For iPhone and iPad. Coming soon to the App Store.</p>
     </div>
     <div class="phone"><img src="assets/screen-viewer.jpg" alt="A historic map in Terra Nota, showing the user's position and pins" width="1206" height="2622"></div>
   </div>
@@ -254,6 +264,18 @@
     <p class="eyebrow">Privacy</p>
     <h2>Your maps are yours.</h2>
     <p class="intro">There are no accounts and no servers of ours. Your maps, pins and location stay on your device and in your own iCloud, and we never see them. <a href="privacy/">Read the privacy policy</a>.</p>
+  </div>
+</section>
+
+<section class="beta">
+  <div class="wrap">
+    <img class="beta-icon" src="assets/icon.png" alt="" loading="lazy">
+    <h2>Try Terra Nota today.</h2>
+    <p class="intro">Terra Nota is in public beta. Install Apple’s free TestFlight app, then join the beta to get Terra Nota on your iPhone or iPad. Feedback is very welcome: take a screenshot in the app and TestFlight offers to send it to us.</p>
+    <a class="badge" href="https://testflight.apple.com/join/ZnjSDkx8">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.66zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.01.61-2.67 1.37-.58.67-1.09 1.76-.95 2.8 1.01.08 2.05-.52 2.68-1.28z"/></svg>
+      Join the beta on TestFlight
+    </a>
   </div>
 </section>
 </main>

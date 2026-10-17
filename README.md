@@ -3,7 +3,7 @@
 Public files for the Terra Nota iOS app, served by GitHub Pages at
 https://colinbm.github.io/terranota-public/.
 
-- `index.html`: the website (a placeholder for now).
+- `index.html` and `assets/`: the website.
 - `privacy/`: the privacy policy.
 - `data/maps-index.json`: a search index of maps georeferenced with
   [Allmaps](https://allmaps.org), built daily from its open data (CC0).

@@ -3,23 +3,256 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terra Nota</title>
+<title>Terra Nota: find yourself on any map</title>
+<meta name="description" content="Terra Nota is an iPhone and iPad app that puts you on any map, old or new. Add a map image, match it to real places, then see where you are on it and drop pins.">
+<meta property="og:title" content="Terra Nota">
+<meta property="og:description" content="Find yourself on any map, old or new.">
+<meta property="og:image" content="https://colinbm.github.io/terranota-public/assets/icon.png">
+<link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <style>
-  :root { color-scheme: light dark; --text: #1d1d1f; --muted: #6e6e73; --bg: #ffffff; }
-  @media (prefers-color-scheme: dark) { :root { --text: #f5f5f7; --muted: #a1a1a6; --bg: #000000; } }
-  body { margin: 0; background: var(--bg); color: var(--text);
-         font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 40px 16px 64px; }
-  h1 { font-size: 30px; margin: 0 0 8px; }
-  .muted { color: var(--muted); }
+  :root {
+    color-scheme: light dark;
+    --paper: #f6eedb;
+    --paper-deep: #ecdfbf;
+    --card: #fbf6ea;
+    --ink: #2f2418;
+    --muted: #6f5d48;
+    --line: #8a6a45;
+    --rule: rgba(122, 90, 54, 0.22);
+    --red: #a8302a;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1b1611;
+      --paper-deep: #221b14;
+      --card: #2a2219;
+      --ink: #f1e6cf;
+      --muted: #bba88a;
+      --line: #c79f6c;
+      --rule: rgba(199, 159, 108, 0.2);
+      --red: #e0675d;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 18px/1.6 var(--serif); }
+  a { color: var(--red); text-underline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* A graticule, like the app icon's */
+  .graticule {
+    background-color: var(--paper-deep);
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center top;
+  }
+
+  header.top { padding: 18px 0; }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none;
+           font-size: 20px; font-weight: 600; }
+  .brand img { width: 32px; height: 32px; border-radius: 8px; }
+  nav a { color: var(--muted); text-decoration: none; font: 15px var(--sans); margin-left: 20px; }
+  nav a:hover { color: var(--ink); }
+
+  .hero { padding: 56px 0 72px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; }
+  .hero-icon { width: 96px; height: 96px; border-radius: 22px;
+               box-shadow: 0 10px 30px rgba(60, 40, 20, 0.25); margin-bottom: 28px; }
+  h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.05; margin: 0 0 18px; font-weight: 600;
+       letter-spacing: -0.01em; }
+  .lede { font-size: 21px; color: var(--muted); margin: 0 0 28px; max-width: 32em; }
+  .badge { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper);
+           border-radius: 12px; padding: 12px 18px; font: 600 15px var(--sans); }
+  .badge svg { width: 18px; height: 18px; fill: currentColor; }
+  .badge-note { font: 14px var(--sans); color: var(--muted); margin: 12px 0 0; }
+
+  .phone { margin: 0 auto; width: min(290px, 100%); border-radius: 46px; padding: 9px;
+           background: #15110d; box-shadow: 0 30px 60px rgba(40, 25, 10, 0.35); }
+  .phone img { border-radius: 38px; width: 100%; height: auto; }
+
+  section { padding: 80px 0; }
+  .eyebrow { font: 600 13px var(--sans); letter-spacing: 0.12em; text-transform: uppercase;
+             color: var(--red); margin: 0 0 10px; }
+  h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.15; margin: 0 0 16px; font-weight: 600; }
+  .intro { color: var(--muted); max-width: 40em; margin: 0 0 40px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: step; }
+  .step { counter-increment: step; }
+  .step .phone { width: min(240px, 100%); margin: 0 0 24px; border-radius: 40px; padding: 8px; }
+  .step .phone img { border-radius: 33px; }
+  .step h3::before { content: counter(step); display: inline-grid; place-items: center; width: 30px; height: 30px;
+                     margin-right: 10px; border-radius: 50%; border: 1.5px solid var(--line); color: var(--line);
+                     font: 600 15px var(--sans); vertical-align: 2px; }
+  h3 { font-size: 21px; margin: 0 0 8px; font-weight: 600; }
+  .step p, .feature p { margin: 0; color: var(--muted); font-size: 17px; }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 24px; }
+  .feature svg { width: 28px; height: 28px; stroke: var(--red); fill: none; stroke-width: 1.6;
+                 stroke-linecap: round; stroke-linejoin: round; margin-bottom: 14px; }
+
+  .libraries .wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: center; }
+  .libraries ul { padding-left: 1.1em; color: var(--muted); }
+  .libraries li { margin: 8px 0; }
+  .libraries p { color: var(--muted); }
+
+  .privacy-note { border-top: 1px solid var(--rule); }
+  .privacy-note .wrap { max-width: 760px; text-align: center; }
+  .privacy-note .intro { margin: 0 auto; }
+
+  footer { border-top: 1px solid var(--rule); padding: 32px 0 48px; font: 14px var(--sans); color: var(--muted); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  footer a { color: var(--muted); }
+
+  @media (max-width: 820px) {
+    .hero { padding: 32px 0 56px; }
+    .hero .wrap, .libraries .wrap { grid-template-columns: 1fr; gap: 40px; }
+    .steps, .features { grid-template-columns: 1fr; }
+    .step .phone { margin: 0 auto 24px; }
+    .features { gap: 14px; }
+    section { padding: 56px 0; }
+    nav a.optional { display: none; }
+    .libraries .phone { order: 2; }
+  }
+  @media (min-width: 821px) and (max-width: 1000px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
+  }
 </style>
 </head>
 <body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="assets/favicon.png" alt="">Terra Nota</a>
+    <nav>
+      <a class="optional" href="#how">How it works</a>
+      <a class="optional" href="#features">Features</a>
+      <a href="privacy/">Privacy</a>
+    </nav>
+  </div>
+</header>
+
 <main>
-<h1>Terra Nota</h1>
-<p>An iPhone and iPad app for finding your way with any map, old or new: add a map image, match it to real places, then see where you are on it and drop pins.</p>
-<p class="muted">Made by Charted Position Ltd.</p>
-<p><a href="privacy/">Privacy Policy</a></p>
+<div class="graticule hero">
+  <div class="wrap">
+    <div>
+      <img class="hero-icon" src="assets/icon.png" alt="Terra Nota app icon">
+      <h1>Find yourself on any map.</h1>
+      <p class="lede">Terra Nota puts a live “you are here” dot on any map image, old or new. Bring an antique county map, a trail leaflet or a site plan, match a few places on it to the real world, then go and explore it.</p>
+      <div class="badge">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.66zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.01.61-2.67 1.37-.58.67-1.09 1.76-.95 2.8 1.01.08 2.05-.52 2.68-1.28z"/></svg>
+        Coming soon to the App Store
+      </div>
+      <p class="badge-note">For iPhone and iPad.</p>
+    </div>
+    <div class="phone"><img src="assets/screen-viewer.jpg" alt="A historic map in Terra Nota, showing the user's position and pins" width="1206" height="2622"></div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2>From paper to “you are here” in three steps.</h2>
+    <p class="intro">No special file formats and no surveying know-how. If you can point at a church or a crossroads on a map, you can calibrate it.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="phone"><img src="assets/screen-maps.jpg" alt="The list of maps in Terra Nota" width="1206" height="2622" loading="lazy"></div>
+        <h3>Add a map</h3>
+        <p>Use a scan, a photo you take on the spot, a screenshot or a file. Or pick one from a library’s collection.</p>
+      </div>
+      <div class="step">
+        <div class="phone"><img src="assets/screen-calibrate.jpg" alt="Matching points on a map to a modern map" width="1206" height="2622" loading="lazy"></div>
+        <h3>Match a few places</h3>
+        <p>Mark three or more points on the map and show where each one is on a modern map. Terra Nota works out the rest, even for maps that are stretched or hand-drawn.</p>
+      </div>
+      <div class="step">
+        <div class="phone"><img src="assets/screen-pins.jpg" alt="Pins on a calibrated map" width="1206" height="2622" loading="lazy"></div>
+        <h3>Head out</h3>
+        <p>See where you are on the map as you move, with north at the top. Drop pins for the things you find.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="graticule">
+  <div class="wrap">
+    <p class="eyebrow">Features</p>
+    <h2>Made for maps that weren’t made for phones.</h2>
+    <p class="intro">Old maps are rarely to scale, rarely square and not always drawn with north at the top. Terra Nota is built around that.</p>
+    <div class="features">
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        <h3>Live position</h3>
+        <p>Your location as a dot on your own map, following its quirks rather than a modern grid. Centre on yourself with one tap.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l5-3 6 3 5-3v13l-5 3-6-3-5 3z"/><path d="M9 4v13M15 7v13"/></svg>
+        <h3>Even or Flexible fit</h3>
+        <p>Keep a surveyed map’s straight lines, or let the fit bend to follow a sketchy hand-drawn plan. Each point shows how well it agrees with the rest.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 5l2.5 7h-5z"/><path d="M9.5 12L12 19l2.5-7"/></svg>
+        <h3>North up, or your way</h3>
+        <p>Maps open turned to north. Twist with two fingers to line one up with the street in front of you.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg>
+        <h3>Pins and lists</h3>
+        <p>Drop pins where you stand or anywhere on the map, with a photo if you like. Sort them into coloured lists that appear on every map of the area.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 4h10a3 3 0 0 1 3 3v10"/></svg>
+        <h3>Every map of a place</h3>
+        <p>Jump between all your maps of the spot you’re looking at, from an 18th-century estate plan to today’s satellite view, at the same place and scale.</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 9.2 4.5 4.5 0 0 0 7 18z"/></svg>
+        <h3>On all your devices</h3>
+        <p>Maps, points and pins sync through your own iCloud, so a map you calibrate on your iPad is ready on your iPhone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="libraries">
+  <div class="wrap">
+    <div class="phone"><img src="assets/screen-library.jpg" alt="Searching library maps by place in Terra Nota" width="1206" height="2622" loading="lazy"></div>
+    <div>
+      <p class="eyebrow">Maps from libraries</p>
+      <h2>Tens of thousands of historic maps, ready to explore.</h2>
+      <p>No map to hand? Search by place and open historic maps straight from library collections.</p>
+      <ul>
+        <li><strong>National Library of Scotland</strong>: Ordnance Survey sheets and more, covering Great Britain in detail.</li>
+        <li><strong>Libraries Worldwide</strong>: maps from collections such as the David Rumsey Map Collection and the Bibliothèque nationale de France, already georeferenced by the <a href="https://allmaps.org">Allmaps</a> community, so there’s nothing to calibrate.</li>
+      </ul>
+      <p>Each map shows its source and licence, with a link back to the library that holds it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="privacy-note graticule">
+  <div class="wrap">
+    <p class="eyebrow">Privacy</p>
+    <h2>Your maps are yours.</h2>
+    <p class="intro">There are no accounts and no servers of ours. Your maps, pins and location stay on your device and in your own iCloud, and we never see them. <a href="privacy/">Read the privacy policy</a>.</p>
+  </div>
+</section>
 </main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Charted Position Ltd</span>
+    <a href="privacy/">Privacy Policy</a>
+  </div>
+</footer>
+
 </body>
 </html>

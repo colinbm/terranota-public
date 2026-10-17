@@ -36,7 +36,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site/data
-          cp -R index.html privacy .nojekyll _site/
+          cp -R index.html privacy assets .nojekyll _site/
 
       - name: Build map index
         run: python3 scripts/build_map_index.py _site/data/maps-index.json

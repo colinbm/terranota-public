@@ -28,7 +28,8 @@ USER_AGENT = "TerraNota/1.0 (+https://terranota.app)"
 # The app searches the National Library of Scotland itself, with licences.
 EXCLUDED_HOSTS = {"map-view.nls.uk"}
 # Libraries whose licences don't allow commercial use, accepted while Terra
-# Nota is free (`AllmapsLibrary.noncommercialSources` in the app).
+# Nota is free (`AllmapsLibrary.noncommercialSources` in the app). A map from
+# one is still left out if its manifest says something stricter.
 NONCOMMERCIAL_HOSTS = {"www.davidrumsey.com", "gallica.bnf.fr", "openapi.bnf.fr"}
 
 ALLOWED_URIS = [
@@ -41,6 +42,14 @@ ALLOWED_URIS = [
 RESTRICTED_TEXT = ["non-commercial", "noncommercial", "by-nc", "by-nd", "by-sa", "all rights reserved"]
 OPEN_TEXT = ["public domain", "gemeinfrei", "no known copyright", "no known restrictions",
              "free of known restrictions", "out of copyright"]
+# For a map from NONCOMMERCIAL_HOSTS: non-commercial and share-alike terms pass
+# too, leaving only stricter ones out.
+NONCOMMERCIAL_URIS = [
+    "rightsstatements.org/vocab/NoC-NC",
+    "creativecommons.org/licenses/by-nc/",
+    "creativecommons.org/licenses/by-nc-sa/",
+]
+NONCOMMERCIAL_RESTRICTED_TEXT = ["by-nd", "nc-nd", "all rights reserved"]
 
 # Days before a manifest is fetched again; each one waits between 1 and 2
 # times this, so a day's worth of first fetches doesn't all come due at once.
@@ -53,19 +62,22 @@ MAX_TEXT = 1000
 DIGITAL_COMMONWEALTH = re.compile(r"ark\.digitalcommonwealth\.org/ark:/50959/([^/]+)/manifest")
 
 
-def is_allowed(rights, text):
+def is_allowed(rights, text, noncommercial=False):
     """Public domain, no known copyright, or attribution only. Anything
     non-commercial, no-derivatives or share-alike is out, and so is a map
     whose licence can't be found. `text` may be HTML: a licence is often only
-    in a link."""
-    if any(pattern in uri for uri in rights for pattern in ALLOWED_URIS):
+    in a link. With `noncommercial` (a map from NONCOMMERCIAL_HOSTS),
+    non-commercial and share-alike terms pass, and so does a manifest that
+    doesn't say: those libraries' terms are known."""
+    if any(pattern in uri for uri in rights
+           for pattern in ALLOWED_URIS + (NONCOMMERCIAL_URIS if noncommercial else [])):
         return True
     if any("creativecommons.org" in uri or "rightsstatements.org" in uri for uri in rights):
         return False
     combined = " ".join(text).lower()
-    if any(word in combined for word in RESTRICTED_TEXT):
+    if any(word in combined for word in (NONCOMMERCIAL_RESTRICTED_TEXT if noncommercial else RESTRICTED_TEXT)):
         return False
-    return any(word in combined for word in OPEN_TEXT)
+    return noncommercial or any(word in combined for word in OPEN_TEXT)
 
 
 def strings(value):
@@ -154,12 +166,13 @@ class Licences:
         host = urlparse(service).hostname
         if host in EXCLUDED_HOSTS:
             return False
-        if host in NONCOMMERCIAL_HOSTS:
-            return True
+        noncommercial = host in NONCOMMERCIAL_HOSTS
         if not manifest_url:
-            return False
+            # Rumsey's maps don't link one (the app works it out), and its
+            # manifests don't state a licence anyway.
+            return noncommercial
         entry = self.entries.get(manifest_url)
-        return is_allowed(entry["rights"], entry["text"]) if entry else None
+        return is_allowed(entry["rights"], entry["text"], noncommercial) if entry else None
 
     def due(self, manifest_url):
         entry = self.entries.get(manifest_url)
